@@ -1,5 +1,6 @@
 services:
   web:
+    container_name: calambet_task_manager
     build: .
     restart: unless-stopped
     env_file:
