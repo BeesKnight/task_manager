@@ -1,0 +1,14 @@
+{% extends "tasks/base.html" %}
+{% load bootstrap4 %}
+
+{% block page_header %}
+  <h1 class="h2">Регистрация</h1>
+{% endblock page_header %}
+
+{% block content %}
+  <form action="{% url 'users:register' %}" method="post">
+    {% csrf_token %}
+    {% bootstrap_form form %}
+    {% bootstrap_button "Зарегистрироваться" button_type="submit" button_class="btn-primary" %}
+  </form>
+{% endblock content %}

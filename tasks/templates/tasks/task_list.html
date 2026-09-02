@@ -1,0 +1,65 @@
+{% extends "tasks/base.html" %}
+
+{% block page_header %}
+  <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mb-3">
+    <h1 class="h2">Мои задачи</h1>
+    <a class="btn btn-primary" href="{% url 'tasks:new_task' %}">Создать задачу</a>
+  </div>
+{% endblock page_header %}
+
+{% block content %}
+  {% if tasks %}
+    <div class="row">
+      {% for task in tasks %}
+        <div class="col-12 mb-3">
+          <div class="card {% if task.completed %}border-success{% elif task.due_date and task.due_date < now %}border-danger{% endif %}">
+            <div class="card-body">
+              <div class="d-flex flex-column flex-md-row justify-content-between">
+                <div>
+                  <h2 class="h5 {% if task.completed %}text-muted{% endif %}">{{ task.title }}</h2>
+                  <p class="mb-2">{{ task.description|default:'Описание не добавлено.' }}</p>
+                </div>
+                <div class="text-md-right">
+                  {% if task.priority == 'high' %}
+                    <span class="badge badge-danger">Высокий приоритет</span>
+                  {% elif task.priority == 'low' %}
+                    <span class="badge badge-secondary">Низкий приоритет</span>
+                  {% else %}
+                    <span class="badge badge-info">Обычный приоритет</span>
+                  {% endif %}
+                  {% if task.completed %}
+                    <span class="badge badge-success">Выполнена</span>
+                  {% elif task.due_date and task.due_date < now %}
+                    <span class="badge badge-warning">Просрочена</span>
+                  {% else %}
+                    <span class="badge badge-light">В работе</span>
+                  {% endif %}
+                </div>
+              </div>
+              <p class="text-muted mb-3">
+                Срок:
+                {% if task.due_date %}
+                  {{ task.due_date|date:'d.m.Y H:i' }}
+                {% else %}
+                  не назначен
+                {% endif %}
+              </p>
+              <div class="d-flex flex-wrap">
+                <a class="btn btn-outline-primary btn-sm mr-2 mb-2" href="{% url 'tasks:edit_task' task.id %}">Редактировать</a>
+                <form action="{% url 'tasks:toggle_task' task.id %}" method="post" class="mr-2 mb-2">
+                  {% csrf_token %}
+                  <button class="btn btn-outline-success btn-sm" type="submit">
+                    {% if task.completed %}Вернуть в работу{% else %}Отметить выполненной{% endif %}
+                  </button>
+                </form>
+                <a class="btn btn-outline-danger btn-sm mb-2" href="{% url 'tasks:delete_task' task.id %}">Удалить</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="text-muted">У вас пока нет задач.</p>
+  {% endif %}
+{% endblock content %}

@@ -1,0 +1,47 @@
+{% load bootstrap4 %}
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Task Manager</title>
+    {% bootstrap_css %}
+    {% bootstrap_javascript jquery='full' %}
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
+      <div class="container">
+        <a class="navbar-brand" href="{% url 'tasks:index' %}">Task Manager</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav mr-auto">
+            {% if user.is_authenticated %}
+              <li class="nav-item"><a class="nav-link" href="{% url 'tasks:task_list' %}">Мои задачи</a></li>
+            {% endif %}
+          </ul>
+          <ul class="navbar-nav align-items-md-center">
+            {% if user.is_authenticated %}
+              <li class="nav-item mr-md-3 text-light">Пользователь: {{ user.username }}</li>
+              <li class="nav-item">
+                <form action="{% url 'users:logout' %}" method="post" class="mb-0">
+                  {% csrf_token %}
+                  <button class="btn btn-outline-light btn-sm" type="submit">Выйти</button>
+                </form>
+              </li>
+            {% else %}
+              <li class="nav-item"><a class="nav-link" href="{% url 'users:login' %}">Войти</a></li>
+              <li class="nav-item"><a class="btn btn-primary btn-sm" href="{% url 'users:register' %}">Регистрация</a></li>
+            {% endif %}
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <main class="container pb-5">
+      {% block page_header %}{% endblock page_header %}
+      {% block content %}{% endblock content %}
+    </main>
+  </body>
+</html>

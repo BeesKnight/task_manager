@@ -1,0 +1,30 @@
+services:
+  web:
+    build: .
+    restart: unless-stopped
+    env_file:
+      - .env
+    command:
+      - sh
+      - -c
+      - |
+        set -e
+        python manage.py migrate --noinput
+        python manage.py collectstatic --noinput
+        exec gunicorn task_manager.wsgi:application \
+          --bind 0.0.0.0:8000 \
+          --workers 2 \
+          --timeout 60
+    ports:
+      - "${APP_BIND_IP:-127.0.0.1}:${APP_PORT:-8002}:8000"
+    volumes:
+      - task_manager_data:/app/data
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/', timeout=3)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  task_manager_data:
